@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Instrucciones — Lumo MVP para OBS</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{--bg:#0D0F14;--card:#171B24;--line:rgba(255,255,255,.08);--tx:#EDF0F6;--tx2:#9AA3B5;--tx3:#5D6675;--acc:#7C6CFF;--ok:#3DD68C;--gold:#F6C050;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--tx);padding:40px 20px 80px;}
+main{max-width:720px;margin:0 auto;}
+h1{font-size:26px;font-weight:700;margin-bottom:8px;}
+.sub{color:var(--tx2);font-size:14px;line-height:1.6;margin-bottom:34px;}
+h2{font-size:16px;font-weight:600;margin:30px 0 12px;display:flex;align-items:center;gap:10px;}
+h2 .n{width:26px;height:26px;border-radius:50%;background:rgba(124,108,255,.15);color:var(--acc);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 26px;}
+p,li{font-size:13.5px;color:var(--tx2);line-height:1.75;}
+ul{padding-left:20px;margin:8px 0;}
+b{color:var(--tx);font-weight:600;}
+code{font-family:ui-monospace,monospace;font-size:12.5px;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--gold);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:12px 0;}
+.tip{border-left:3px solid var(--ok);}
+.warn{border-left:3px solid var(--gold);}
+.k{display:inline-block;background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-size:12px;color:var(--tx);}
+</style>
+</head>
+<body>
+<main>
+  <h1>Instalar tus letreros en OBS</h1>
+  <p class="sub">Dos archivos, cero servidores: <b>Overlay.html</b> es la capa transparente que se ve en tu live, y <b>Panel OBS.html</b> es tu botonera. Se comunican entre sí automáticamente dentro de OBS.</p>
+
+  <h2><span class="n">1</span>Descarga los archivos</h2>
+  <p>Guarda la carpeta <code>MVP OBS</code> completa en tu computadora (por ejemplo en <code>Documentos/Lumo</code>). Los dos archivos deben quedar en la misma carpeta.</p>
+
+  <h2><span class="n">2</span>Añade el Overlay como fuente</h2>
+  <ul>
+    <li>En OBS: <b>Fuentes → + → Navegador</b></li>
+    <li>Marca <b>"Archivo local"</b> y selecciona <code>Overlay.html</code></li>
+    <li>Ancho: <code>1080</code> · Alto: <code>1920</code> (o el tamaño de tu lienzo vertical)</li>
+    <li>Colócala como la capa de más arriba</li>
+  </ul>
+  <div class="card tip"><p>✅ El fondo es transparente: solo se verán los letreros sobre tu cámara.</p></div>
+
+  <h2><span class="n">3</span>Añade el Panel como dock</h2>
+  <ul>
+    <li>En OBS: menú <b>Docks → Docks personalizados del navegador…</b></li>
+    <li>Nombre: <code>Lumo Panel</code></li>
+    <li>URL: la ruta del archivo, por ejemplo:<br /><code>file:///C:/Users/TuUsuario/Documentos/Lumo/Panel OBS.html</code></li>
+    <li>Aplica — el panel aparece como ventana acoplable dentro de OBS</li>
+  </ul>
+  <div class="card tip"><p>✅ Cuando el panel detecta el overlay, arriba a la derecha verás <b style="color:var(--ok)">"Overlay conectado"</b>.</p></div>
+
+  <h2><span class="n">4</span>Úsalo en tu live</h2>
+  <ul>
+    <li>Toca cualquier pad para lanzar ese letrero (o teclas <span class="k">1</span>–<span class="k">6</span>, <span class="k">0</span> detiene)</li>
+    <li>Edita textos, animaciones, tamaño y tiempos en la sección <b>Editar letrero</b> — se guardan solos</li>
+    <li>Fija comentarios del chat con <b>📌 Fijar comentario</b></li>
+  </ul>
+
+  <h2><span class="n">5</span>Stream Deck (opcional)</h2>
+  <p>Mientras llega el plugin oficial, la vía más simple: usa la acción <b>Hotkey</b> del Stream Deck para enviar <span class="k">1</span>–<span class="k">6</span> con el panel enfocado, o la acción <b>Multi Action</b> que enfoque OBS y envíe la tecla.</p>
+
+  <div class="card warn"><p>⚠️ <b>Importante:</b> el panel debe abrirse <b>dentro de OBS como dock</b> (no en Chrome) para que pueda hablar con el overlay. Para probar fuera de OBS, abre ambos archivos en el mismo navegador: también funciona.</p></div>
+
+  <h2><span class="n">·</span>Probar sin OBS</h2>
+  <p>Abre <code>Overlay.html?test=1</code> en tu navegador para verlo con fondo oscuro de prueba, y <code>Panel OBS.html</code> en otra pestaña del mismo navegador. Los botones del panel controlan el overlay en vivo.</p>
+</main>
+</body>
+</html>

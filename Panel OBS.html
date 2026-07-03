@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumo Panel — En vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Marcellus&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0D0F14; --card:#171B24; --card2:#1D2230;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.13);
+  --tx:#EDF0F6; --tx2:#9AA3B5; --tx3:#5D6675;
+  --acc:#7C6CFF; --accSoft:rgba(124,108,255,.14);
+  --ok:#3DD68C; --live:#FF4D67;
+  --gold1:#FFF4D6; --gold2:#F6C050; --gold3:#D98A1F;
+  --sans:'Sora',system-ui,sans-serif; --serif:'Marcellus',Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;}
+#wrap{max-width:430px;margin:0 auto;padding:16px 14px 26px;display:flex;flex-direction:column;gap:14px;}
+
+header{display:flex;align-items:center;gap:10px;}
+.logo-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--acc),#4ED0C2);display:flex;align-items:center;justify-content:center;font:700 14px var(--sans);color:#fff;}
+header b{font:700 15px var(--sans);}
+header span{display:block;font:400 10px var(--sans);color:var(--tx3);letter-spacing:.1em;text-transform:uppercase;}
+.status{margin-left:auto;display:flex;align-items:center;gap:7px;font:600 11px var(--sans);color:var(--tx3);background:var(--card);border:1px solid var(--line);padding:6px 12px;border-radius:16px;}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--tx3);}
+.status.on{color:var(--ok);} .status.on i{background:var(--ok);box-shadow:0 0 7px var(--ok);}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;}
+.lbl{font:600 10px var(--sans);letter-spacing:.15em;text-transform:uppercase;color:var(--tx3);margin-bottom:11px;display:flex;align-items:center;gap:8px;}
+.lbl .r{margin-left:auto;font:500 10px var(--sans);letter-spacing:0;text-transform:none;color:var(--tx3);}
+
+.pads{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.pad{position:relative;border:1px solid rgba(246,192,80,.35);border-radius:12px;background:linear-gradient(175deg,rgba(45,24,5,.75),rgba(18,10,2,.85));padding:15px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .08s ease,box-shadow .15s ease;user-select:none;}
+.pad:hover{box-shadow:0 0 18px rgba(246,192,80,.18);}
+.pad:active{transform:scale(.96);}
+.pad b{font:400 17px var(--serif);background:linear-gradient(175deg,#FFFCF5,var(--gold1) 40%,var(--gold2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;max-width:100%;overflow:hidden;}
+.pad span{font:400 9.5px var(--sans);color:var(--tx3);}
+.pad .key{position:absolute;top:7px;left:8px;font:600 9px var(--sans);color:var(--tx3);background:rgba(255,255,255,.07);padding:2px 6px;border-radius:5px;}
+.pad.playing{outline:2px solid var(--gold2);outline-offset:2px;}
+.pad.stop{border-color:rgba(255,77,103,.4);background:rgba(255,77,103,.08);grid-column:1/-1;flex-direction:row;justify-content:center;padding:12px;}
+.pad.stop b{font:600 13px var(--sans);color:var(--live);-webkit-text-fill-color:var(--live);background:none;}
+
+.field{margin-bottom:10px;}
+.field label{display:block;font:400 11px var(--sans);color:var(--tx3);margin-bottom:5px;}
+input[type=text],select,textarea{width:100%;background:#0E1118;border:1px solid var(--line);border-radius:9px;color:var(--tx);font:400 13px var(--sans);padding:10px 11px;outline:none;appearance:none;}
+input[type=text]:focus,select:focus,textarea:focus{border-color:rgba(124,108,255,.5);}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235D6675'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+textarea{resize:vertical;min-height:58px;}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.row:last-child{margin-bottom:0;}
+.row>span{font:400 12px var(--sans);color:var(--tx2);flex:0 0 auto;}
+input[type=range]{-webkit-appearance:none;appearance:none;width:150px;height:4px;border-radius:4px;background:rgba(255,255,255,.12);outline:none;padding:0;border:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--acc);cursor:pointer;}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;border:none;background:var(--acc);cursor:pointer;}
+.seg{display:flex;gap:5px;}
+.seg button{flex:1;border:1px solid var(--line);background:var(--card2);color:var(--tx2);font:500 11px var(--sans);padding:8px 4px;border-radius:8px;cursor:pointer;}
+.seg button.active{background:var(--accSoft);border-color:rgba(124,108,255,.45);color:var(--tx);font-weight:600;}
+.toggle{position:relative;width:40px;height:22px;border-radius:22px;background:rgba(255,255,255,.12);cursor:pointer;transition:background .2s;flex:0 0 auto;}
+.toggle.on{background:var(--acc);}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;}
+.toggle.on::after{transform:translateX(18px);}
+.btn{width:100%;border:none;border-radius:10px;font:600 13px var(--sans);padding:11px;cursor:pointer;}
+.btn.p{background:linear-gradient(135deg,var(--acc),#9d8cff);color:#fff;}
+.btn.g{background:var(--card2);color:var(--tx);border:1px solid var(--line2);}
+.btn-row{display:flex;gap:8px;}
+.pinned{display:none;margin-top:10px;background:var(--card2);border:1px solid var(--line);border-left:3px solid #4ED0C2;border-radius:9px;padding:9px 12px;}
+.pinned.on{display:block;}
+.pinned b{font:600 10px var(--sans);color:#4ED0C2;display:block;margin-bottom:3px;}
+.pinned span{font:400 12px var(--sans);color:var(--tx2);line-height:1.45;}
+.foot{font:400 10.5px var(--sans);color:var(--tx3);line-height:1.6;text-align:center;}
+.foot a{color:var(--acc);text-decoration:none;}
+.foot b{color:var(--tx2);}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <div class="logo-mark">L</div>
+    <div><b>Panel en vivo</b><span>Lumo · letreros</span></div>
+    <div class="status" id="status"><i></i><em id="statusTx" style="font-style:normal">Buscando overlay…</em></div>
+  </header>
+
+  <div class="card">
+    <div class="lbl">Disparar letrero <span class="r">teclas 1–6 · 0 detiene</span></div>
+    <div class="pads" id="pads"></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">Editar letrero</div>
+    <div class="field"><select id="editSel"></select></div>
+    <div class="field"><label>Etiqueta superior (vacío = sin etiqueta)</label><input type="text" id="inLabel" /></div>
+    <div class="field"><label>Texto principal</label><input type="text" id="inTitle" /></div>
+    <div class="field"><label>Entrada</label>
+      <select id="selEntrance">
+        <option value="rise">↑ Sube con brillo dorado</option>
+        <option value="fall">↓ Cae desde arriba</option>
+        <option value="wave">〜 Ola alternada</option>
+        <option value="type">⌨ Máquina de escribir</option>
+        <option value="blur">◎ Enfoque (blur)</option>
+        <option value="split">◀▶ Split desde los lados</option>
+        <option value="zoom">⊕ Zoom explosivo</option>
+        <option value="spin">↺ Giro lateral</option>
+        <option value="elastic">⦿ Resorte elástico</option>
+        <option value="flip3d">⬢ Volteo 3D por letra</option>
+        <option value="slideblur">⇥ Deslizar (motion blur)</option>
+        <option value="focus">◉ Enfoque cinematográfico</option>
+        <option value="polvo">✧ Polvo dorado (partículas)</option>
+        <option value="onda">◌ Onda expansiva</option>
+        <option value="reveal">▭ Barrido de luz</option>
+        <option value="cascada">⌄ Cascada con rebote</option>
+        <option value="neon">⚡ Neón parpadeante</option>
+        <option value="random">✦ Aleatorio (varía solo)</option>
+      </select>
+    </div>
+    <div class="field"><label>Salida</label>
+      <select id="selExit">
+        <option value="up">↑ Sube y desaparece</option>
+        <option value="down">↓ Baja y desaparece</option>
+        <option value="scale">⊖ Encoge</option>
+        <option value="chars-rain">☂ Letras caen</option>
+        <option value="chars-up">↑↑ Letras suben</option>
+        <option value="blur-out">◎ Desenfoque</option>
+        <option value="flip">⟳ Giro 3D</option>
+        <option value="scatter">✺ Dispersión</option>
+        <option value="drop">⬇ Caída con gravedad</option>
+        <option value="dissolve">≈ Evaporar</option>
+        <option value="dust">✧ Desintegrar en polvo</option>
+        <option value="implode">◌ Implosión al centro</option>
+        <option value="sweep">▭ Barrido de luz</option>
+        <option value="random">✦ Aleatorio (varía solo)</option>
+      </select>
+    </div>
+    <div class="field"><label>Posición en pantalla</label>
+      <div class="seg" id="posSeg">
+        <button data-pos="upper">Arriba</button>
+        <button data-pos="center">Centro</button>
+        <button data-pos="lower">Abajo</button>
+      </div>
+    </div>
+    <div class="row"><span>Tamaño del texto</span><input type="range" id="sizeSlider" min="70" max="170" step="2" /></div>
+    <div class="row"><span>Padding interno</span><input type="range" id="padSlider" min="24" max="78" step="2" /></div>
+    <div class="row"><span>Tiempo visible</span><input type="range" id="holdSlider" min="600" max="5500" step="200" /></div>
+    <div class="row"><span>Repetir en bucle</span><div class="toggle" id="loopToggle"></div></div>
+  </div>
+
+  <div class="card">
+    <div class="lbl">📌 Fijar comentario</div>
+    <div class="field"><textarea id="pinInput" placeholder="Pega o escribe el comentario a mostrar en pantalla…"></textarea></div>
+    <div class="btn-row">
+      <button class="btn p" id="pinBtn">Fijar en pantalla</button>
+      <button class="btn g" id="unpinBtn">Quitar</button>
+    </div>
+    <div class="pinned" id="pinnedBox"><b>FIJADO AHORA</b><span id="pinnedTx"></span></div>
+  </div>
+
+  <p class="foot">
+    <b>Cómo funciona:</b> añade <b>Overlay.html</b> como fuente de navegador en OBS y este panel como <b>dock personalizado</b> — se comunican solos. <a href="Instrucciones.html" target="_blank">Ver instrucciones →</a>
+  </p>
+</div>
+
+<script>
+(function(){
+const DEFAULTS=[
+  {key:'bienvenidos',name:'Bienvenidos',label:'',title:'¡Bienvenidos!',entrance:'polvo',exit:'dust',icon:null,pos:'lower',size:118,pad:46,hold:2400,loop:true},
+  {key:'taptap',name:'Tap Tap',label:'Toca la pantalla, demos mucho',title:'Tap Tap',entrance:'zoom',exit:'chars-rain',icon:'hearts',pos:'lower',size:118,pad:46,hold:2400,loop:true},
+  {key:'comparte',name:'Comparte',label:'Ayúdame a crecer',title:'Comparte el live',entrance:'reveal',exit:'sweep',icon:'share',pos:'lower',size:100,pad:46,hold:2400,loop:true},
+  {key:'sigueme',name:'Sígueme',label:'No te lo pierdas',title:'Sígueme',entrance:'cascada',exit:'down',icon:'plus',pos:'lower',size:118,pad:46,hold:2400,loop:true},
+  {key:'gracias',name:'Gracias',label:'Por tu regalo',title:'¡Gracias!',entrance:'onda',exit:'implode',icon:'spark',pos:'center',size:118,pad:46,hold:2400,loop:false},
+  {key:'nuevo',name:'Nuevo fan',label:'Nuevo seguidor',title:'¡Bienvenido!',entrance:'elastic',exit:'scatter',icon:'spark',pos:'lower',size:118,pad:46,hold:2000,loop:false},
+];
+const STORE='lumo_presets_v1';
+let presets;
+try{presets=JSON.parse(localStorage.getItem(STORE))||null;}catch(e){presets=null;}
+if(!Array.isArray(presets)||presets.length!==DEFAULTS.length) presets=DEFAULTS.map(p=>({...p}));
+function save(){try{localStorage.setItem(STORE,JSON.stringify(presets));}catch(e){}}
+
+let editing=0, playingIdx=-1;
+
+/* command bus */
+function send(cmd){cmd.ts=Date.now()+Math.random();try{localStorage.setItem('lumo_cmd',JSON.stringify(cmd));}catch(e){}}
+function fire(i){
+  playingIdx=i;renderPads();
+  send({action:'show',preset:{...presets[i]}});
+}
+function stopAll(){playingIdx=-1;renderPads();send({action:'stop'});}
+
+/* pads */
+const padsEl=document.getElementById('pads');
+const ENT_NAMES={rise:'Sube',fall:'Cae',wave:'Ola',type:'Máquina',blur:'Blur',split:'Split',zoom:'Zoom',spin:'Giro',elastic:'Resorte',flip3d:'Volteo 3D',slideblur:'Motion blur',focus:'Enfoque',polvo:'Polvo dorado',onda:'Onda',reveal:'Barrido',cascada:'Cascada',neon:'Neón',random:'Aleatorio'};
+function renderPads(){
+  padsEl.innerHTML='';
+  presets.forEach((p,i)=>{
+    const d=document.createElement('div');
+    d.className='pad'+(i===playingIdx?' playing':'');
+    d.innerHTML='<span class="key">'+(i+1)+'</span><b>'+esc(p.title)+'</b><span>'+(ENT_NAMES[p.entrance]||p.entrance)+'</span>';
+    d.onclick=()=>fire(i);
+    padsEl.appendChild(d);
+  });
+  const stop=document.createElement('div');
+  stop.className='pad stop';
+  stop.innerHTML='<b>⏹ Detener todo (0)</b>';
+  stop.onclick=stopAll;
+  padsEl.appendChild(stop);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* editor */
+const editSel=document.getElementById('editSel');
+const inLabel=document.getElementById('inLabel'), inTitle=document.getElementById('inTitle');
+const selEntrance=document.getElementById('selEntrance'), selExit=document.getElementById('selExit');
+const posSeg=document.getElementById('posSeg');
+const sizeSlider=document.getElementById('sizeSlider'), padSlider=document.getElementById('padSlider'), holdSlider=document.getElementById('holdSlider');
+const loopToggle=document.getElementById('loopToggle');
+
+presets.forEach((p,i)=>{
+  const o=document.createElement('option');o.value=i;o.textContent=(i+1)+' · '+p.name;editSel.appendChild(o);
+});
+function loadEditor(){
+  const p=presets[editing];
+  inLabel.value=p.label;inTitle.value=p.title;
+  selEntrance.value=p.entrance;selExit.value=p.exit;
+  sizeSlider.value=p.size;padSlider.value=p.pad;holdSlider.value=p.hold;
+  loopToggle.classList.toggle('on',!!p.loop);
+  [...posSeg.children].forEach(b=>b.classList.toggle('active',b.dataset.pos===p.pos));
+}
+editSel.onchange=()=>{editing=Number(editSel.value);loadEditor();};
+inLabel.oninput=()=>{presets[editing].label=inLabel.value;save();};
+inTitle.oninput=()=>{presets[editing].title=inTitle.value;save();renderPads();};
+selEntrance.onchange=()=>{presets[editing].entrance=selEntrance.value;save();renderPads();};
+selExit.onchange=()=>{presets[editing].exit=selExit.value;save();};
+posSeg.querySelectorAll('button').forEach(b=>{
+  b.onclick=()=>{presets[editing].pos=b.dataset.pos;save();loadEditor();};
+});
+sizeSlider.oninput=()=>{presets[editing].size=Number(sizeSlider.value);save();};
+padSlider.oninput=()=>{presets[editing].pad=Number(padSlider.value);save();};
+holdSlider.oninput=()=>{presets[editing].hold=Number(holdSlider.value);save();};
+loopToggle.onclick=()=>{presets[editing].loop=!presets[editing].loop;loopToggle.classList.toggle('on',presets[editing].loop);save();};
+
+/* pin */
+const pinInput=document.getElementById('pinInput');
+const pinnedBox=document.getElementById('pinnedBox'), pinnedTx=document.getElementById('pinnedTx');
+document.getElementById('pinBtn').onclick=()=>{
+  const t=pinInput.value.trim();if(!t)return;
+  send({action:'pin',text:t});
+  pinnedTx.textContent='"'+t+'"';pinnedBox.classList.add('on');
+};
+document.getElementById('unpinBtn').onclick=()=>{
+  send({action:'unpin'});pinnedBox.classList.remove('on');
+};
+try{const saved=JSON.parse(localStorage.getItem('lumo_pin')||'null');if(saved&&saved.text){pinnedTx.textContent='"'+saved.text+'"';pinnedBox.classList.add('on');}}catch(e){}
+
+/* keyboard shortcuts */
+addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key>='1'&&e.key<='6'){const i=Number(e.key)-1;if(presets[i])fire(i);}
+  if(e.key==='0')stopAll();
+});
+
+/* overlay heartbeat status */
+const statusEl=document.getElementById('status'), statusTx=document.getElementById('statusTx');
+setInterval(()=>{
+  let hb=0;try{hb=Number(localStorage.getItem('lumo_overlay_hb')||0);}catch(e){}
+  const on=Date.now()-hb<6000;
+  statusEl.classList.toggle('on',on);
+  statusTx.textContent=on?'Overlay conectado':'Buscando overlay…';
+},1500);
+
+renderPads();loadEditor();
+})();
+</script>
+</body>
+</html>
